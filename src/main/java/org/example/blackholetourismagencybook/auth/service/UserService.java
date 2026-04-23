@@ -3,6 +3,7 @@ package org.example.blackholetourismagencybook.auth.service;
 import org.example.blackholetourismagencybook.auth.dto.UserCreateRequest;
 import org.example.blackholetourismagencybook.auth.dto.UserCreatedResponse;
 import org.example.blackholetourismagencybook.auth.dto.UserResponse;
+import org.example.blackholetourismagencybook.auth.entity.Role;
 import org.example.blackholetourismagencybook.auth.entity.User;
 import org.example.blackholetourismagencybook.auth.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(request.getPassword());
         user.setPassword(encodedPassword);
 
+        user.setRole(Role.USER);
+
         userRepository.save(user);
 
         UserCreatedResponse response = new UserCreatedResponse();
@@ -41,18 +44,14 @@ public class UserService {
 
     //Verify user
 
-    public UserResponse verifyUser(String username, String passwd){
+    public User verifyUser(String username, String passwd){
         User user = getUserByUsername(username);
 
         if(!passwordEncoder.matches(passwd,user.getPassword())){
             throw new RuntimeException("Invalid password");
         }
 
-        UserResponse response = new UserResponse();
-        response.setUsername(user.getUsername());
-        response.setEmail(user.getEmail());
-
-        return response;
+        return user;
     }
 
 

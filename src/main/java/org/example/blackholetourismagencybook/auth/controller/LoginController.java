@@ -2,6 +2,7 @@ package org.example.blackholetourismagencybook.auth.controller;
 
 import jakarta.validation.Valid;
 import org.example.blackholetourismagencybook.auth.dto.*;
+import org.example.blackholetourismagencybook.auth.entity.User;
 import org.example.blackholetourismagencybook.auth.service.JwtService;
 import org.example.blackholetourismagencybook.auth.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +27,13 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request){
-        UserResponse response =  userService.verifyUser(request.getUsername(),request.getPassword());
+        User user =  userService.verifyUser(request.getUsername(),request.getPassword());
 
-        String token = jwtService.generateToken(request.getUsername());
+        String token = jwtService.generateToken(request.getUsername(),user.getRole().name());
+
+        UserResponse response = new UserResponse();
+        response.setUsername(user.getUsername());
+        response.setEmail(user.getEmail());
 
         LoginResponse LR = new LoginResponse();
         LR.setToken(token);

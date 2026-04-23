@@ -16,12 +16,13 @@ public class JwtService {
     //eyJhbGci(Header (Red):Specifies the algorithm (e.g., HS256) and type (JWT).).
     // xxxxxx.(Payload (Purple): Contains claims, such as user data (e.g., username, ID) and expiration time.)
     // yyyyyy(Signature (Blue): Encrypts the header and payload to ensure data integrity.
-    public String generateToken(String username){
+    public String generateToken(String username, String role){
         long now = System.currentTimeMillis();
         long expiry = 1000 * 60 * 60 * 10;
 
         return Jwts.builder()
                 .setSubject(username)
+                .claim("role", role)
                 .setIssuedAt(new Date(now))
                 .setExpiration(new Date(now + expiry))
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -30,6 +31,7 @@ public class JwtService {
 
     public String extractUsername(String token) {
         return parseClaims(token).getSubject();//get name from payload.
+
     }
 
     public boolean isValid(String token) {
@@ -42,7 +44,7 @@ public class JwtService {
     }
 
 
-    private Claims parseClaims(String token){
+    public Claims parseClaims(String token){
         return Jwts.parserBuilder()
                 .setSigningKey(key) //according to the jwt header(the algorithm inside it), calculate if the sign is the same to key at the top
                 .build()

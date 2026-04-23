@@ -1,11 +1,13 @@
 package org.example.blackholetourismagencybook.auth.service;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -46,12 +48,16 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String token = header.substring(7);//eyJhbGci.xxxxxx.yyyyyy
         if (jwtService.isValid(token)){
-            String username = jwtService.extractUsername(token);
+            Claims claims = jwtService.parseClaims(token);
+            String username = claims.getSubject();
+            String role = claims.get("role", String.class);
+
+            List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
 
             //Encapsulate as "Authorized" and save in system context
             UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(
-                            username, null, List.of());
+                            username, null, authorities);
 
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
