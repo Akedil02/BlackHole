@@ -13,6 +13,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserStatus status = UserStatus.PENDING_QUESTIONNAIRE;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

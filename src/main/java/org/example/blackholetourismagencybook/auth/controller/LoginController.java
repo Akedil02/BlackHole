@@ -29,7 +29,7 @@ public class LoginController {
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request){
         User user =  userService.verifyUser(request.getUsername(),request.getPassword());
 
-        String token = jwtService.generateToken(request.getUsername(),user.getRole().name());
+        String token = jwtService.generateToken(request.getUsername(),user.getRole().name(),user.getStatus().name());
 
         UserResponse response = new UserResponse();
         response.setUsername(user.getUsername());

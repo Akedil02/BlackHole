@@ -16,13 +16,14 @@ public class JwtService {
     //eyJhbGci(Header (Red):Specifies the algorithm (e.g., HS256) and type (JWT).).
     // xxxxxx.(Payload (Purple): Contains claims, such as user data (e.g., username, ID) and expiration time.)
     // yyyyyy(Signature (Blue): Encrypts the header and payload to ensure data integrity.
-    public String generateToken(String username, String role){
+    public String generateToken(String username, String role, String status){
         long now = System.currentTimeMillis();
         long expiry = 1000 * 60 * 60 * 10;
 
         return Jwts.builder()
                 .setSubject(username)
                 .claim("role", role)
+                .claim("status", status)
                 .setIssuedAt(new Date(now))
                 .setExpiration(new Date(now + expiry))
                 .signWith(key, SignatureAlgorithm.HS256)

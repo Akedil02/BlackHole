@@ -58,7 +58,8 @@ public class UserService {
 
     //GetByUsername
     public User getUserByUsername(String username){
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         if(user == null) {
             throw new RuntimeException("User not found");
