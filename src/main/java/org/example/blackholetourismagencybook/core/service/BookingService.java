@@ -8,6 +8,8 @@ import org.example.blackholetourismagencybook.core.entity.BlackHole;
 import org.example.blackholetourismagencybook.core.entity.BookingOrder;
 import org.example.blackholetourismagencybook.core.repository.BlackHoleRepository;
 import org.example.blackholetourismagencybook.core.repository.BookingOrderRepository;
+import org.example.blackholetourismagencybook.externalBankClient.PaymentDTO;
+import org.example.blackholetourismagencybook.externalBankClient.PaymentFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,8 @@ public class BookingService {
     private BlackHoleRepository blackHoleRepository;
     @Autowired
     private KafkaTemplate<String,Object> kafkaTemplate;
+    @Autowired
+    private PaymentFeignClient paymentFeignClient;
 
     @Transactional
     public BookingOrder calculateAndDraftBooking(Long userId, BookingRequestDTO request) {
@@ -79,8 +83,18 @@ public class BookingService {
         BookingOrder order = bookingOrderRepository.findById(orderId)
                 .orElseThrow(()-> new RuntimeException("Order doesn't exist"));
 
-        //paymentGateway.charge(userId, amount);
+        PaymentDTO.Request paymentRequest = new PaymentDTO.Request();
+        paymentRequest.setUserId(userId);
+        paymentRequest.setOrderId(orderId);
+        paymentRequest.setAmount(99800.0);
 
+        PaymentDTO.Response bankResponse = paymentFeignClient.processCharge(paymentRequest);
+
+        if (!bankResponse.isSuccess()) {
+            throw new RuntimeException("Payment failed via Mock Bank: " + bankResponse.getMessage());
+        }
+        System.out.println("✅ Payment Gateway Transaction ID: " + bankResponse.getTransactionId());
+        
         order.setStatus(BookingOrder.OrderStatus.PAID);
         bookingOrderRepository.save(order);
 

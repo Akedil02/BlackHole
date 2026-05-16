@@ -5,6 +5,8 @@ import org.example.blackholetourismagencybook.core.dto.DisputeResolutionDTO;
 import org.example.blackholetourismagencybook.core.dto.TripTelemetryDTO;
 import org.example.blackholetourismagencybook.core.entity.BookingOrder;
 import org.example.blackholetourismagencybook.core.repository.BookingOrderRepository;
+import org.example.blackholetourismagencybook.externalBankClient.PaymentDTO;
+import org.example.blackholetourismagencybook.externalBankClient.PaymentFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,8 @@ public class ReconciliationService {
     private BookingOrderRepository bookingOrderRepository;
 
     private static final double TOLERANCE_THRESHOLD = 0.02;
+    @Autowired
+    private PaymentFeignClient paymentFeignClient;
 
     @Transactional
     public BookingOrder processTelemetry(Long orderId, TripTelemetryDTO telemetry){
@@ -59,7 +63,20 @@ public class ReconciliationService {
         }
 
         if(resolution.getChoice() == DisputeResolutionDTO.ResolutionChoice.REFUND){
-            //Bank api, return the money
+
+            PaymentDTO.Request refundRequest = new PaymentDTO.Request();
+            refundRequest.setUserId(userId);
+            refundRequest.setOrderId(orderId);
+
+            refundRequest.setAmount(500000.0);
+
+            PaymentDTO.Response bankResponse = paymentFeignClient.processRefound(refundRequest);
+
+            if(!bankResponse.isSuccess()){
+                throw new RuntimeException("Refund transfer failed: "+ bankResponse.getMessage());
+            }
+            System.out.println("Refund successfully transferred. Transaction Id: " + bankResponse.getTransactionId());
+
             order.setStatus(BookingOrder.OrderStatus.REFUNDED);
         } else if (resolution.getChoice() == DisputeResolutionDTO.ResolutionChoice.EXCHANGE) {
             //Generate new draft order
