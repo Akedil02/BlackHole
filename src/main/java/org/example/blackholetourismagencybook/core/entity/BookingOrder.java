@@ -35,6 +35,11 @@ public class BookingOrder {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    private Double actualShipYears;
+    private Double actualEarthYears;
+    private Double discrepancyPercentage;
+    private Integer compensationTier;
+
 
     public enum OrderStatus{
         DRAFT,
@@ -48,7 +53,9 @@ public class BookingOrder {
         IN_ORBIT,
         RETURNING,
         COMPLETED,
-        DISPUTE_PENDING
+        DISPUTE_PENDING,
+        REFUNDED,
+        EXCHANGED
     }
 
 }

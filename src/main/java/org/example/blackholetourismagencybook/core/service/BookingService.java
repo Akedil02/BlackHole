@@ -9,6 +9,7 @@ import org.example.blackholetourismagencybook.core.entity.BookingOrder;
 import org.example.blackholetourismagencybook.core.repository.BlackHoleRepository;
 import org.example.blackholetourismagencybook.core.repository.BookingOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 
@@ -22,6 +23,8 @@ public class BookingService {
     private BookingOrderRepository bookingOrderRepository;
     @Autowired
     private BlackHoleRepository blackHoleRepository;
+    @Autowired
+    private KafkaTemplate<String,Object> kafkaTemplate;
 
     @Transactional
     public BookingOrder calculateAndDraftBooking(Long userId, BookingRequestDTO request) {
