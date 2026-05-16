@@ -3,5 +3,8 @@ package org.example.blackholetourismagencybook.core.repository;
 import org.example.blackholetourismagencybook.core.entity.BookingOrder;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface BookingOrderRepository extends JpaRepository<BookingOrder, Long> {
+    List<BookingOrder> findByStatus(BookingOrder.OrderStatus status);
 }

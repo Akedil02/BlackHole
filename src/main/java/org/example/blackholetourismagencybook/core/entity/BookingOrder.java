@@ -38,7 +38,7 @@ public class BookingOrder {
 
     public enum OrderStatus{
         DRAFT,
-        PENDING_WAIVER,
+        PENDING_PAYMENT,
         PAID,
         CANCELED,
 
