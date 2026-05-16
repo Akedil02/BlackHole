@@ -9,12 +9,12 @@ public class PhysicsEngineService {
     //Schwarzschild Radius Constant
     private static final double RS_CONSTANT = 2.95;
 
-    public double calculateEarthTime(double shipYears, double blackHoleMassSolar, double orbitRadiusKm) throws IllegalAccessException {
+    public double calculateEarthTime(double shipYears, double blackHoleMassSolar, double orbitRadiusKm) throws IllegalArgumentException {
 
         double schwarzschildRadius = RS_CONSTANT * blackHoleMassSolar;
 
         if(orbitRadiusKm <= schwarzschildRadius) {
-            throw new IllegalAccessException("Physical Constraint: The orbital radius must be greater than the event horizon (Schwarzschild radius:" + schwarzschildRadius + " km).");
+            throw new IllegalArgumentException("Physical Constraint: The orbital radius must be greater than the event horizon (Schwarzschild radius:" + schwarzschildRadius + " km).");
         }
 
         double dilationFactor = Math.sqrt(1 - (schwarzschildRadius / orbitRadiusKm));

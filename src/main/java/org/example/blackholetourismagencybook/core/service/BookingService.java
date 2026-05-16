@@ -1,0 +1,50 @@
+package org.example.blackholetourismagencybook.core.service;
+
+import jakarta.transaction.Transactional;
+import org.example.blackholetourismagencybook.core.dto.BookingRequestDTO;
+import org.example.blackholetourismagencybook.core.entity.BlackHole;
+import org.example.blackholetourismagencybook.core.entity.BookingOrder;
+import org.example.blackholetourismagencybook.core.repository.BlackHoleRepository;
+import org.example.blackholetourismagencybook.core.repository.BookingOrderRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class BookingService {
+    @Autowired
+    private PhysicsEngineService physicsEngineService;
+    @Autowired
+    private BookingOrderRepository bookingOrderRepository;
+    @Autowired
+    private BlackHoleRepository blackHoleRepository;
+
+    @Transactional
+    public BookingOrder calculateAndDraftBooking(Long userId, BookingRequestDTO request) {
+
+
+        BlackHole blackHole = blackHoleRepository.findById(request.getBlackHoleId())
+                .orElseThrow(() -> new RuntimeException("Destination doesn't exist or no more supported."));
+
+
+        double rs = 2.95 * blackHole.getMassSolar();
+        double orbitRadiusKm;
+
+        if (request.getOrbitType() == BookingRequestDTO.OrbitType.EXTREME) {
+            orbitRadiusKm = rs * 1.005;
+        } else {
+            orbitRadiusKm = rs * 3.0;
+        }
+
+        double earthYears = physicsEngineService.calculateEarthTime(request.getShipYears(), blackHole.getMassSolar(), orbitRadiusKm);
+
+        BookingOrder order = new BookingOrder();
+        order.setUserId(userId);
+        order.setBlackHoleId(blackHole.getId());
+        order.setOrbitRadiusKm(orbitRadiusKm);
+        order.setExpectedShipYears(request.getShipYears());
+        order.setExpectedEarthYears(earthYears);
+        order.setStatus(BookingOrder.OrderStatus.DRAFT);
+
+        return bookingOrderRepository.save(order);
+    }
+}

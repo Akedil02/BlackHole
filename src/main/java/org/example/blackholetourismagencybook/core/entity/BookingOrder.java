@@ -40,7 +40,15 @@ public class BookingOrder {
         DRAFT,
         PENDING_WAIVER,
         PAID,
-        COMPLETED
+        CANCELED,
+
+        //---Execution---//
+
+        DEPARTED,
+        IN_ORBIT,
+        RETURNING,
+        COMPLETED,
+        DISPUTE_PENDING
     }
 
 }

@@ -27,7 +27,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/auth/{id}").hasRole("ADMIN")
                         .requestMatchers("/api/onboarding/**").authenticated()
-                        .requestMatchers("/api/booking/**", "/api/physics-engine/**").hasRole("ACTIVE")
+                        .requestMatchers("/api/booking/**").hasRole("ACTIVE")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
